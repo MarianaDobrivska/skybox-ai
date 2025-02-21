@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Key, useEffect, useState } from "react";
+import { Key, useEffect, useRef, useState } from "react";
 
 interface ImageI {
   id: Key;
@@ -11,6 +11,13 @@ interface ImageI {
 export default function Home() {
   const [images, setImages] = useState<ImageI[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFloatedPreview, setFloatedPreview] = useState(false);
+  const [floatedPreviewPosition, setFloatedPreviewPosition] = useState({
+    x: 0,
+    y: 0,
+  });
+  const hoverStartTimeRef = useRef(0);
+  const activeImage = useRef<string | null>(null);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -28,6 +35,42 @@ export default function Home() {
     fetchImages();
   }, []);
 
+  const handle360MouseMove = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ): void => {
+    const allowZooming = Date.now() - hoverStartTimeRef.current > 550;
+    if (allowZooming) {
+      const containerRect = e.currentTarget.getBoundingClientRect();
+      const xPercent =
+        ((e.clientX - containerRect.left) / containerRect.width) * 10;
+      const yPercent =
+        ((e.clientY - containerRect.top) / containerRect.height) * 10;
+      setFloatedPreviewPosition({ x: xPercent - 5, y: yPercent - 0 });
+    }
+  };
+
+  const handle360MouseLeave = () => {
+    setFloatedPreview(false);
+    setFloatedPreviewPosition({ x: 0, y: 0 });
+    activeImage.current = null;
+  };
+
+  const handle360MouseEnter = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ): void => {
+    hoverStartTimeRef.current = Date.now();
+    setFloatedPreview(true);
+    activeImage.current = e.currentTarget.id;
+  };
+
+  const dynamicStyle = isFloatedPreview
+    ? {
+        transform: `translate(${floatedPreviewPosition.x}%, ${floatedPreviewPosition.y}%)`,
+        transition: "all 150ms linear",
+        scale: 1.3,
+      }
+    : {};
+
   if (loading) {
     return (
       <div className="h-full w-full flex justify-center items-center">
@@ -35,15 +78,23 @@ export default function Home() {
       </div>
     );
   }
+
   return (
     <main>
       <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-        {images.map((image) => (
-          <div key={image.id} className="group cursor-pointer">
+        {images.map(({ id, url, description }) => (
+          <div
+            key={id}
+            id={id as string}
+            className="cursor-pointer w-full rounded-lg outline outline-transparent duration-300 ease-in-out overflow-hidden hover:outline-green-300 xl:aspect-7/8"
+            onMouseEnter={handle360MouseEnter}
+            onMouseLeave={handle360MouseLeave}
+            onMouseMove={handle360MouseMove}>
             <Image
-              className="w-full rounded-lg bg-gray-200 object-cover outline duration-300 ease-in-out group-hover:outline-green-300 xl:aspect-7/8"
-              src={image.url}
-              alt={image.description}
+              className="w-full object-cover rounded-lg duration-300 ease-in-out scale-[1.2]"
+              style={activeImage.current === id.toString() ? dynamicStyle : {}}
+              src={url}
+              alt={description}
               width={300}
               height={150}
               priority

@@ -3,9 +3,9 @@ import { supabase } from "@/lib/supabaseClient";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Record<string, string> }
 ) {
-  const { id } = await context.params;
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ error: "ID is required" }, { status: 400 });

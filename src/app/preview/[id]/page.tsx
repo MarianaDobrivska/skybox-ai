@@ -21,7 +21,7 @@ export default function PreviewPage() {
 
   useEffect(() => {
     fetchImageUrl(id).then(setSrc).catch(console.error);
-  }, []);
+  }, [id]);
 
   return src ? <PanoramaViewer imageUrl={src} /> : <Loader />;
 }

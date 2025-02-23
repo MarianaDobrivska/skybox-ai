@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
+interface RouteContext {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Record<string, string> }
-) {
+  _: NextRequest,
+  { params }: RouteContext
+): Promise<NextResponse> {
   const { id } = await params;
 
   if (!id) {

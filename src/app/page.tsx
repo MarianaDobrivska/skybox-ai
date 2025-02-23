@@ -1,6 +1,8 @@
 "use client";
-import Image from "next/image";
 import { Key, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Loader from "@/components/Loader";
 
 interface ImageI {
   id: Key;
@@ -9,6 +11,7 @@ interface ImageI {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [images, setImages] = useState<ImageI[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFloatedPreview, setFloatedPreview] = useState(false);
@@ -63,6 +66,10 @@ export default function Home() {
     activeImage.current = e.currentTarget.id;
   };
 
+  const onClick = () => {
+    router.push(`/preview/${activeImage.current}`);
+  };
+
   const dynamicStyle = isFloatedPreview
     ? {
         transform: `translate(${floatedPreviewPosition.x}%, ${floatedPreviewPosition.y}%)`,
@@ -72,15 +79,11 @@ export default function Home() {
     : {};
 
   if (loading) {
-    return (
-      <div className="h-full w-full flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-dashed border-gray-300 rounded-full animate-spin border-t-transparent" />
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
-    <main>
+    <main className="p-4 sm:p-6 xl:p-10">
       <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
         {images.map(({ id, url, description }) => (
           <div
@@ -89,7 +92,8 @@ export default function Home() {
             className="cursor-pointer w-full rounded-lg outline outline-transparent duration-300 ease-in-out overflow-hidden hover:outline-green-300 xl:aspect-7/8"
             onMouseEnter={handle360MouseEnter}
             onMouseLeave={handle360MouseLeave}
-            onMouseMove={handle360MouseMove}>
+            onMouseMove={handle360MouseMove}
+            onClick={onClick}>
             <Image
               className="w-full object-cover rounded-lg duration-300 ease-in-out scale-[1.2]"
               style={activeImage.current === id.toString() ? dynamicStyle : {}}

@@ -14,7 +14,10 @@ export async function GET(
   const { id } = await params;
 
   if (!id) {
-    return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "ID is required" },
+      { status: 400, statusText: "ID is required" }
+    );
   }
 
   const { data, error } = await supabase
@@ -24,7 +27,10 @@ export async function GET(
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Image not found" },
+      { status: 404, statusText: "Image not found" }
+    );
   }
 
   return NextResponse.json({ url: data.url });

@@ -7,7 +7,7 @@ export async function GET() {
   if (error) {
     return NextResponse.json(
       { error: "Error fetching images" },
-      { status: 500 }
+      { status: 500, statusText: "Error fetching images" }
     );
   }
 

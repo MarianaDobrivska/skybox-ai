@@ -1,27 +1,13 @@
 "use client";
 import Loader from "@/components/Loader";
 import PanoramaViewer from "@/components/PanoramaViewer";
+import { useImage } from "@/hooks/useQueries";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function PreviewPage() {
   const { id } = useParams<{ id: string }>();
-  const [src, setSrc] = useState("");
 
-  async function fetchImageUrl(id: string) {
-    const res = await fetch(`/api/image/${id}`);
-    const data = await res.json();
+  const { data, isLoading } = useImage(id);
 
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to fetch image");
-    }
-
-    return data.url;
-  }
-
-  useEffect(() => {
-    fetchImageUrl(id).then(setSrc).catch(console.error);
-  }, [id]);
-
-  return src ? <PanoramaViewer imageUrl={src} /> : <Loader />;
+  return isLoading ? <Loader /> : <PanoramaViewer imageUrl={data?.url} />;
 }

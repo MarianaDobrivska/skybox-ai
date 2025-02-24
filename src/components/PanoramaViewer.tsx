@@ -78,8 +78,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ imageUrl }) => {
         }
       },
       undefined,
-      (err) => {
-        console.error("Error loading texture:", err);
+      () => {
         setIsLoading(false);
       }
     );

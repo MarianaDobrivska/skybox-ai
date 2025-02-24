@@ -1,8 +1,9 @@
 "use client";
-import { Key, useEffect, useRef, useState } from "react";
+import { Key, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Loader from "@/components/Loader";
+import { useImagesList } from "@/hooks/useQueries";
 
 interface ImageI {
   id: Key;
@@ -12,8 +13,7 @@ interface ImageI {
 
 export default function Home() {
   const router = useRouter();
-  const [images, setImages] = useState<ImageI[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: images = [], isLoading } = useImagesList();
   const [isFloatedPreview, setFloatedPreview] = useState(false);
   const [floatedPreviewPosition, setFloatedPreviewPosition] = useState({
     x: 0,
@@ -21,22 +21,6 @@ export default function Home() {
   });
   const hoverStartTimeRef = useRef(0);
   const activeImage = useRef<string | null>(null);
-
-  useEffect(() => {
-    const fetchImages = async () => {
-      const response = await fetch("/api/images");
-      const data = await response.json();
-
-      if (response.ok) {
-        setImages(data);
-      } else {
-        console.error("Error fetching images:", data.error);
-      }
-      setLoading(false);
-    };
-
-    fetchImages();
-  }, []);
 
   const handle360MouseMove = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -78,14 +62,14 @@ export default function Home() {
       }
     : {};
 
-  if (loading) {
+  if (isLoading) {
     return <Loader />;
   }
 
   return (
     <main className="p-4 sm:p-6 xl:p-10">
       <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-        {images.map(({ id, url, description }) => (
+        {images.map(({ id, url, description }: ImageI) => (
           <div
             key={id}
             id={id as string}

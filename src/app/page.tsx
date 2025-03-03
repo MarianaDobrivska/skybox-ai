@@ -67,7 +67,7 @@ export default function Home() {
   }
 
   return (
-    <main className="p-4 sm:p-6 xl:p-10">
+    <main className="pt-[110px] px-4 pb-4 sm:px-6 sm:pb-6 xl:px-10 xl:pb-10">
       <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
         {images.map(({ id, url, description }: ImageI) => (
           <div

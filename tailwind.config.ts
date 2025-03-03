@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 export default {
   content: [
@@ -14,5 +15,20 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addUtilities }) {
+      const newUtilities = {
+        ".text-outline-sm": {
+          textShadow: `
+            -2px -2px  0 rgba(127, 44, 154, 0.3),
+            2px -2px 0 rgba(127, 44, 154, 0.3),
+           -2px 2px 0 rgba(127, 44, 154, 0.3),
+            2px 2px 0 rgba(127, 44, 154, 0.3)
+          `,
+        },
+      };
+
+      addUtilities(newUtilities);
+    }),
+  ],
 } satisfies Config;
